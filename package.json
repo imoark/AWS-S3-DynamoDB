@@ -1,0 +1,11 @@
+{
+  "name": "music-microservice",
+  "description": "A services that adds all of your audio files in an S3 bucket to a DynamoDB database. A service that allows a user to search for a song(the name of the file) or returns a list of all of the songs(files) you have in your S3 bucket. A service that allows you to create a new playlist and add a song to that playlist.(You might want to use a second DynamoDB table for this)",
+  "version": "1.0.0",
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "aws-sdk": "^2.221.1",
+    "uuid": "^3.2.1"
+  }
+}

@@ -1,0 +1,106 @@
+service: music-serverless # NOTE: update this with your service name
+
+custom:
+  bucket: music-bucket-serverless
+
+provider:
+  name: aws
+  runtime: nodejs6.10
+  region: us-west-2
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:Query
+        - dynamodb:Scan
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - dynamodb:UpdateItem
+        - dynamodb:DeleteItem
+      Resource: "arn:aws:dynamodb:us-west-2:*:*"
+    - Effect: Allow
+      Action:
+        - s3:*
+      Resource: "*"
+
+    - Effect: "Allow"
+      Action:
+        - lambda:InvokeFunction
+        - lambda:InvokeAsync
+      Resource: "*"
+
+functions:
+  generate:
+    handler: micromusic/generate.generate
+    events:
+      - http:
+          path: micromusic/generate
+          method: get
+          cors: true 
+
+  list:
+    handler: micromusic/list.list
+    events:
+      - http:
+          path: micromusic/list
+          method: get
+          cors: true 
+
+  get:
+    handler: micromusic/get.get
+    events:
+      - http:
+          path: micromusic/search/{filename}
+          method: get
+          cors: true
+
+  cplaylist:
+    handler: micromusic/createplaylist.createplaylist
+    events:
+      - http:
+          path: micromusic/playlist/create
+          method: post
+          cors: true     
+
+  gplaylist:
+    handler: micromusic/grabplaylist.grabplaylist
+    events:
+      - http:
+          path: micromusic/playlist/grab
+          method: get
+          cors: true               
+
+resources:
+  Resources:
+    MicroMusicDynamoDbTable:
+      Type: 'AWS::DynamoDB::Table'
+#      DeletionPolicy: Retain
+      Properties:
+        AttributeDefinitions:
+          -
+            AttributeName: id
+            AttributeType: N
+        KeySchema:
+          -
+            AttributeName: id
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        TableName: 'musiclist'
+
+    MicroMusicPlaylistDynamoDbTable:
+      Type: 'AWS::DynamoDB::Table'
+#      DeletionPolicy: Retain
+      Properties:
+        AttributeDefinitions:
+          -
+            AttributeName: id
+            AttributeType: S
+        KeySchema:
+          -
+            AttributeName: id
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        TableName: 'musicplaylist'
